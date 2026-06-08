@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-  Tingyu Yang<sup>1</sup>,
+  <a href="https://frakenation.github.io/">Tingyu Yang<sup>1</sup>,
   <a href="https://cyuan328.github.io/">Yuan Cheng</a><sup>1</sup>,
   <a href="https://xiaoyunyuan.net/">Xiaoyun Yuan</a><sup>1</sup>
 </p>
