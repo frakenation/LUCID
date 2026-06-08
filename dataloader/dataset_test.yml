@@ -1,0 +1,4 @@
+datasets:
+  - name: "example"
+    lq_image_path: "./data/test/input"
+    gt_image_path: "./data/test/gt"

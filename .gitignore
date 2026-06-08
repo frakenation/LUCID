@@ -1,0 +1,11 @@
+*.pth
+*.pt
+*.safetensors
+*.ckpt
+*.bin
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
