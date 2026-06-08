@@ -218,6 +218,12 @@ LUCID can be used before or after downstream editing/generation by removing dist
 
 ## Contents
 
+- [Model Capabilities](#model-capabilities)
+  - [Holistic Nighttime Restoration](#holistic-nighttime-restoration)
+  - [Flare Mitigation](#flare-mitigation)
+  - [Single-Image HDR Reconstruction](#single-image-hdr-reconstruction)
+  - [Downstream Creative Applications](#downstream-creative-applications)
+- [Contents](#contents)
 - [Installation](#installation)
 - [Pretrained Weights](#pretrained-weights)
 - [Configuration](#configuration)
@@ -297,10 +303,10 @@ Multi-scale exposure control:
 bash scripts/infer_lucid_cfg_index.sh
 ```
 
-Save disentanglement components and an output grid:
+To synthesize an HDR result, add the following flag to the command in `scripts/infer_lucid_cfg_index.sh`:
 
 ```bash
-bash scripts/infer_lucid_components.sh
+    --enable_hdr_fusion \
 ```
 
 Edit the explicit command-line arguments inside each script before running it.
