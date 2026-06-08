@@ -28,9 +28,6 @@
   <a href="https://arxiv.org/abs/2606.06901">
     <img src="https://img.shields.io/badge/Paper-arXiv-red?logo=arxiv">
   </a>
-  <a href="https://arxiv.org/pdf/2606.06901">
-    <img src="https://img.shields.io/badge/PDF-arXiv-b31b1b">
-  </a>
   <a href="https://www.youtube.com/watch?v=AGPLSiZcK_I">
     <img src="https://img.shields.io/badge/Video-YouTube-red?logo=youtube">
   </a>
