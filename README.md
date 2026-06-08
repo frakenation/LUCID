@@ -57,7 +57,8 @@ LUCID is designed for nighttime image restoration where underexposure, flare, gh
 - **Single-Image HDR Reconstruction:** use controllable exposure synthesis to recover HDR-style outputs.
 - **Creative Downstream Use:** clean flare and exposure artifacts before editing or generation workflows.
 
-## Continuous Exposure Control
+<details>
+<summary><b>Continuous Exposure Control</b></summary>
 
 LUCID enables continuous output exposure modulation through CFG-scale control. The same input can be restored into different illumination states while preserving scene structure.
 
@@ -78,7 +79,10 @@ LUCID enables continuous output exposure modulation through CFG-scale control. T
 </table>
 </div>
 
-## Light-Source Control
+</details>
+
+<details>
+<summary><b>Light-Source Control</b></summary>
 
 LUCID can preserve visible light sources or suppress them together with associated flare and ghosting artifacts.
 
@@ -94,7 +98,10 @@ LUCID can preserve visible light sources or suppress them together with associat
   <b>Suppress Source</b>
 </p>
 
-## Representative Results
+</details>
+
+<details>
+<summary><b>Restoration and Deflare Results</b></summary>
 
 ### Holistic Nighttime Restoration
 
@@ -162,6 +169,11 @@ LUCID removes scattering artifacts while maintaining plausible light-source appe
 </table>
 </div>
 
+</details>
+
+<details>
+<summary><b>HDR Reconstruction and Creative Applications</b></summary>
+
 ### Single-Image HDR Reconstruction
 
 LUCID extends naturally to HDR reconstruction by synthesizing controllable pseudo-exposure sequences from one input.
@@ -200,12 +212,15 @@ LUCID can be used before or after downstream editing/generation by removing dist
   <img src="figs/creative.png" width="90%" alt="Creative workflow results">
 </p>
 
+</details>
+
 ---
 
 ## Contents
 
 - [Installation](#installation)
 - [Pretrained Weights](#pretrained-weights)
+- [Configuration](#configuration)
 - [Inference](#inference)
 - [Training](#training)
 - [Citation](#citation)
@@ -235,6 +250,33 @@ git clone https://huggingface.co/stabilityai/sd-turbo /path/to/sd-turbo
 ```
 
 Update `--pretrained_model_name_or_path` in the scripts with the downloaded checkpoint path.
+
+## Configuration
+
+The public config files use relative placeholder paths. Before running training or evaluation, edit them for your own dataset layout:
+
+```yaml
+datasets:
+  - name: "example"
+    lq_image_path: "./data/test/input"
+    gt_image_path: "./data/test/gt"
+```
+
+For restoration or inference, each dataset item needs `gt_image_path` and either `lq_image_path` or `lol_gt_path`. For training with synthetic flare, also configure the flare asset folders in `dataloader/dataset_diff.yml`:
+
+```yaml
+flare_datasets:
+  scattering_flare_paths:
+    - "./data/flare/Scattering_Flare/Compound_Flare"
+  reflective_flare_paths:
+    - "./data/flare/Reflective_Flare"
+  light_source_paths:
+    - "./data/flare/Scattering_Flare/Light_Source"
+```
+
+`dataloader/flare_config.yml` controls flare synthesis parameters such as gamma, noise, blur, geometric transforms, and crop size. It is used by training dataloaders. Inference does not require `--flare_config_path`; it only uses `--dataset_config_path` plus the model checkpoints.
+
+The example scripts are intentionally written as explicit command lines. Replace `stabilityai/sd-turbo`, `./lucid_checkpoints/model_40000.pkl`, and `./checkpoints/flare_disentanglement/latest.pth` with your own downloaded checkpoint paths when needed.
 
 ## Inference
 
