@@ -22,6 +22,9 @@
 </p>
 
 <p align="center">
+  <a href="https://xiaoyunyuan.net/index.html?project=lucid">
+    <img src="https://img.shields.io/badge/Project-Page-blue">
+  </a>
   <a href="https://arxiv.org/abs/2606.06901">
     <img src="https://img.shields.io/badge/Paper-arXiv-red?logo=arxiv">
   </a>
@@ -210,7 +213,7 @@ LUCID can be used before or after downstream editing/generation by removing dist
 ## Installation
 
 ```bash
-cd LUCID_code
+cd LUCID
 pip install -r requirements.txt
 ```
 
@@ -231,74 +234,45 @@ git lfs install
 git clone https://huggingface.co/stabilityai/sd-turbo /path/to/sd-turbo
 ```
 
-Pass the downloaded path through `BASE_MODEL`:
-
-```bash
-BASE_MODEL=/path/to/sd-turbo bash scripts/infer_lucid.sh
-```
+Update `--pretrained_model_name_or_path` in the scripts with the downloaded checkpoint path.
 
 ## Inference
 
 Single-scale restoration:
 
 ```bash
-BASE_MODEL=/path/to/sd-turbo \
-MODEL_CKPT=/path/to/lucid_model.pkl \
-DISENTANGLEMENT_CKPT=/path/to/flare_disentanglement.pth \
-DATASET_CONFIG=dataloader/dataset_test.yml \
-OUTPUT_DIR=./results/lucid_cfg_150 \
-INFERENCE_MODE=cfg_guidance \
-CFG_SCALE=1.5 \
 bash scripts/infer_lucid.sh
 ```
 
 Multi-scale exposure control:
 
 ```bash
-BASE_MODEL=/path/to/sd-turbo \
-MODEL_CKPT=/path/to/lucid_model.pkl \
-DISENTANGLEMENT_CKPT=/path/to/flare_disentanglement.pth \
-CFG_SCALES=0.25,0.50,0.75,0.95,1.05,1.25,1.50 \
-OUTPUT_DIR=./results/lucid_cfg_index \
 bash scripts/infer_lucid_cfg_index.sh
 ```
 
-HDR fusion from synthesized exposure states:
+Save disentanglement components and an output grid:
 
 ```bash
-ENABLE_HDR_FUSION=1 \
-VISUALIZE_WEIGHTS=1 \
-bash scripts/infer_lucid_cfg_index.sh
+bash scripts/infer_lucid_components.sh
 ```
+
+Edit the explicit command-line arguments inside each script before running it.
 
 ## Training
 
 Train flare disentanglement:
 
 ```bash
-DATASET_CONFIG=dataloader/dataset_diff.yml \
-FLARE_CONFIG=dataloader/flare_config.yml \
-CHECKPOINT_DIR=./checkpoints/flare_disentanglement \
 bash scripts/train_decomp.sh
 ```
 
 Train LUCID restoration:
 
 ```bash
-BASE_MODEL=/path/to/sd-turbo \
-DISENTANGLEMENT_CKPT=./checkpoints/flare_disentanglement/latest.pth \
-DATASET_CONFIG=dataloader/dataset_diff.yml \
-FLARE_CONFIG=dataloader/flare_config.yml \
-OUTPUT_DIR=./lucid_checkpoints \
-TRACKER_RUN_NAME=lucid_train \
 bash scripts/train_lucid.sh
 ```
 
-Enable mixing-state UNet:
-
-```bash
-MS_UNET=1 bash scripts/train_lucid.sh
-```
+The training script enables the mixing-state UNet through the explicit `--ms_unet` flag.
 
 ## Citation
 
