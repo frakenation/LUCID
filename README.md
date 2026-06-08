@@ -239,7 +239,7 @@ Install the PyTorch build matching your CUDA environment if it is not already av
 | Component | Description | Download Link |
 | --- | --- | --- |
 | SD-Turbo | Pretrained one-step diffusion backbone | [Hugging Face](https://huggingface.co/stabilityai/sd-turbo) |
-| Flare Disentanglement | Required for public LUCID inference | (https://drive.google.com/file/d/1r3pisp_sxNqbLc3svHk6pue0Sl0BVSp-/view?usp=sharing) |
+| Flare Disentanglement | Required for public LUCID inference | [Google Drive](https://drive.google.com/file/d/1r3pisp_sxNqbLc3svHk6pue0Sl0BVSp-/view?usp=sharing) |
 | LUCID Restoration | Main restoration checkpoint | To be released |
 
 Download SD-Turbo with Git LFS:
