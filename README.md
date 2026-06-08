@@ -262,17 +262,22 @@ datasets:
     gt_image_path: "./data/test/gt"
 ```
 
-For restoration or inference, each dataset item needs `gt_image_path` and either `lq_image_path` or `lol_gt_path`. For training with synthetic flare, also configure the flare asset folders in `dataloader/dataset_diff.yml`:
+For restoration or inference, each dataset item needs `gt_image_path` and either `lq_image_path` or `lol_gt_path`.
+
+For synthetic-flare training, download **Flare7K++** from the official [ykdai/Flare7K repository](https://github.com/ykdai/Flare7K#data-download). After extracting the dataset, configure its `Flare7K` and `Flare-R` folders in `dataloader/dataset_diff.yml`:
 
 ```yaml
 flare_datasets:
   scattering_flare_paths:
-    - "./data/flare/Scattering_Flare/Compound_Flare"
+    - "./data/Flare7Kpp/Flare7K/Scattering_Flare/Compound_Flare"
   reflective_flare_paths:
-    - "./data/flare/Reflective_Flare"
+    - "./data/Flare7Kpp/Flare7K/Reflective_Flare"
   light_source_paths:
-    - "./data/flare/Scattering_Flare/Light_Source"
+    - "./data/Flare7Kpp/Flare7K/Scattering_Flare/Light_Source"
+    - "./data/Flare7Kpp/Flare-R/Light_Source"
 ```
+
+`scattering_flare_paths` and `reflective_flare_paths` provide flare patterns for synthetic composition. `light_source_paths` provides the corresponding light-source annotations used by flare-reinput training. Keep the extracted Flare7K++ directory structure unchanged, or update these paths to match its location.
 
 `dataloader/flare_config.yml` controls flare synthesis parameters such as gamma, noise, blur, geometric transforms, and crop size. It is used by training dataloaders. Inference does not require `--flare_config_path`; it only uses `--dataset_config_path` plus the model checkpoints.
 
