@@ -51,12 +51,6 @@
 
 LUCID is designed for nighttime image restoration where underexposure, flare, ghosting, and light-source artifacts are coupled. Instead of treating low-light enhancement and flare removal as separate problems, LUCID learns a unified controllable restoration process.
 
-- **Deflare + Low-Light Enhancement:** restore dark, flare-contaminated nighttime scenes in one model.
-- **Continuous Exposure Control:** synthesize smoothly varying exposure states from a single input.
-- **Light-Source Editing:** preserve visible illuminants or suppress them with associated flare.
-- **Single-Image HDR Reconstruction:** use controllable exposure synthesis to recover HDR-style outputs.
-- **Creative Downstream Use:** clean flare and exposure artifacts before editing or generation workflows.
-
 <details>
 <summary><b>Continuous Exposure Control</b></summary>
 
