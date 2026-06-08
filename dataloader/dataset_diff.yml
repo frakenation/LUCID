@@ -1,0 +1,16 @@
+datasets:
+  - name: "example_train"
+    lol_gt_path: "./data/train/low"
+    gt_image_path: "./data/train/gt"
+    lq_image_path: "./data/train/input"
+
+flare_datasets:
+  scattering_flare_paths:
+    - "./data/Flare7Kpp/Flare7K/Scattering_Flare/Compound_Flare"
+
+  reflective_flare_paths:
+    - "./data/Flare7Kpp/Flare7K/Reflective_Flare"
+
+  light_source_paths:
+    - "./data/Flare7Kpp/Flare7K/Scattering_Flare/Light_Source"
+    - "./data/Flare7Kpp/Flare-R/Light_Source"

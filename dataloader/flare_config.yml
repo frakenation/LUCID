@@ -1,0 +1,45 @@
+# Gamma correction
+gamma:
+  min: 1.8
+  max: 2.2
+
+# Color jitter
+color_jitter:
+  brightness: [0.8, 3.0]
+  hue: 0.0
+
+# Noise synthesis
+noise:
+  sigma_chi_factor: 0.01
+  gain_min: 1.0
+  gain_max: 1.2
+  dc_offset_min: -0.02
+  dc_offset_max: 0.02
+
+# Light-source detection
+light_detection:
+  threshold_factor: 0.01
+
+# Flare transforms
+flare_transform:
+  random_flip: true
+  rotation_degrees: [0, 360]
+  scale_range: [0.2, 1.5]
+  translate: [0, 0]
+  shear_range: [-20, 20]
+
+# Blur synthesis
+blur:
+  kernel_size: 21
+  sigma_min: 0.1
+  sigma_max: 3.0
+
+# Image sizing
+image_size:
+  resize_target: 512
+  final_crop: 512
+
+# Mask generation
+mask:
+  luminance_threshold: 0.99
+  color_threshold: 0.99

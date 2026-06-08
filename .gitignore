@@ -9,3 +9,6 @@
 *.gif
 *.webp
 *.bmp
+.DS_Store
+__pycache__/
+*.py[cod]
