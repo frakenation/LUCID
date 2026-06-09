@@ -250,25 +250,26 @@ Update `--pretrained_model_name_or_path` in the scripts with the downloaded chec
 
 ## Configuration
 
-The public config files use relative placeholder paths. Before running training or evaluation, edit them for your own dataset layout:
+We recommend preparing LQ images before training the main LUCID model. Configure
+the precomputed LQ images and their paired GT images as follows:
 
 ```yaml
 datasets:
-  - name: "example"
-    lq_image_path: "./data/test/input"
-    gt_image_path: "./data/test/gt"
+  - name: "main_training"
+    lq_image_path: "./data/train/lq"
+    gt_image_path: "./data/train/gt"
 ```
 
-Files are aligned by their filename stem, so `input/0001.jpg`, `low/0001.png`, and
-`gt/0001.png` form one sample. Main diffusion training requires `gt_image_path`
-and a precomputed `lq_image_path`; GT files without a matching LQ filename are
-excluded. `lol_gt_path` is optional for the main diffusion dataset and enables
-negative-mode targets.
+For flare-disentanglement training, or when enabling flare reinput while training
+the main LUCID model, configure clean low-light and GT pairs for online flare
+synthesis:
 
-Flare-reinput training and flare-disentanglement training use `lol_gt_path`
-together with the configured flare assets to synthesize flare-corrupted inputs
-online. They do not consume precomputed files from `lq_image_path`. Inference
-continues to accept `lq_image_path` directly.
+```yaml
+datasets:
+  - name: "online_flare_training"
+    lol_gt_path: "./data/train/low"
+    gt_image_path: "./data/train/gt"
+```
 
 For synthetic-flare training, download **Flare7K++** from the official [ykdai/Flare7K repository](https://github.com/ykdai/Flare7K#data-download). After extracting the dataset, configure its `Flare7K` and `Flare-R` folders in `dataloader/dataset_diff.yml`:
 
