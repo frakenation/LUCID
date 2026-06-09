@@ -128,8 +128,8 @@ class FlareDisentanglementDataset(data.Dataset):
 class LUCIDPairedDataset(data.Dataset):
     """Aligned restoration pairs for the main LUCID restoration model."""
 
-    def __init__(self, dataset_config_path, height=512, width=512, flare_config_path=None,
-                 require_lq=False):
+    def __init__(self, dataset_config_path=None, height=512, width=512, flare_config_path=None,
+                 require_lq=False, input_dir=None):
         super().__init__()
 
         self.target_size = (height, width)
@@ -144,7 +144,12 @@ class LUCIDPairedDataset(data.Dataset):
             self.image_size = min(height, width)
             self.resize_target = min(height, width)
 
-        dataset_config = load_config(dataset_config_path)
+        if input_dir is not None:
+            dataset_config = {'datasets': [{'lq_image_path': input_dir}]}
+        elif dataset_config_path is not None:
+            dataset_config = load_config(dataset_config_path)
+        else:
+            raise ValueError("Provide dataset_config_path or input_dir.")
         self.data_mappings = load_aligned_restoration_mappings(
             dataset_config,
             self.ext,
@@ -155,6 +160,8 @@ class LUCIDPairedDataset(data.Dataset):
                 "No aligned GT/LQ pairs found. Diffusion training requires lq_image_path "
                 "and matching GT/LQ basenames."
             )
+        if not self.data_mappings:
+            raise ValueError("No input images found.")
         self.lol_data_list = [
             mapping['lq_image_path'] or mapping['lol_gt_path']
             for mapping in self.data_mappings
@@ -188,18 +195,20 @@ class LUCIDPairedDataset(data.Dataset):
         mapping = self.data_mappings[idx]
 
         try:
-            gt_tensor = self._load_gt_tensor(mapping)
             input_tensor = self._load_input_tensor(mapping)
             if input_tensor is None:
                 return self.__getitem__((idx + 1) % len(self.data_mappings))
 
             result = {
                 "input_image": input_tensor,
-                "gt_image": gt_tensor,
-                "has_gt": True,
                 "data_type": "preprocessed_or_lol",
                 "basename": mapping['basename'],
             }
+
+            gt_tensor = self._load_gt_tensor(mapping)
+            result["has_gt"] = gt_tensor is not None
+            if gt_tensor is not None:
+                result["gt_image"] = gt_tensor
 
             lol_gt_tensor = self._load_lol_gt_tensor(mapping)
             if lol_gt_tensor is not None:
@@ -216,7 +225,10 @@ class LUCIDPairedDataset(data.Dataset):
             return self.__getitem__((idx + 1) % len(self.data_mappings))
 
     def _load_gt_tensor(self, mapping):
-        gt_image = load_image_any_format(mapping['gt_image_path'])
+        gt_path = mapping.get('gt_image_path')
+        if not gt_path or not os.path.exists(gt_path):
+            return None
+        gt_image = load_image_any_format(gt_path)
         return self.preprocess_image_consistent(gt_image)
 
     def _load_input_tensor(self, mapping):

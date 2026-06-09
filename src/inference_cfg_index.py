@@ -96,7 +96,9 @@ def main():
     """Run LUCID CFG-sequence inference and optional HDR fusion."""
     parser = argparse.ArgumentParser(description='LUCID inference with CFG scales and HDR fusion')
 
-    parser.add_argument('--dataset_config_path', type=str, required=True)
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument('--input_dir', type=str)
+    input_group.add_argument('--dataset_config_path', type=str)
 
     parser.add_argument('--pretrained_model_name_or_path', type=str, default='stabilityai/sd-turbo')
     parser.add_argument('--model_path', type=str, default=None)
@@ -155,6 +157,7 @@ def main():
 
     dataset = LUCIDPairedDataset(
         dataset_config_path=args.dataset_config_path,
+        input_dir=args.input_dir,
         height=args.resolution,
         width=args.resolution
     )

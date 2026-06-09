@@ -3,7 +3,7 @@ set -e
 
 export PYTHONPATH=.
 python -m src.inference \
-    --dataset_config_path dataloader/dataset_test.yml \
+    --input_dir ./data/test/input \
     --pretrained_model_name_or_path stabilityai/sd-turbo \
     --model_path ./lucid_checkpoints/model_40000.pkl \
     --flare_disentanglement_path ./checkpoints/flare_disentanglement/latest.pth \

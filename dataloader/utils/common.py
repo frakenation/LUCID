@@ -106,7 +106,7 @@ def load_flare_assets(dataset_config, extensions=IMAGE_EXTENSIONS, include_light
 
 
 def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSIONS, require_lq=False):
-    """Create LUCID restoration mappings aligned by GT basename."""
+    """Create restoration mappings, using GT as the training anchor or LQ for inference."""
     data_mappings = []
 
     for dataset_info in dataset_config['datasets']:
@@ -114,24 +114,35 @@ def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSION
         gt_image_path = dataset_info.get('gt_image_path')
         lq_image_path = dataset_info.get('lq_image_path')
         dataset_name = dataset_info.get('name', '<unnamed>')
-        if not gt_image_path:
-            print("Skipping dataset without gt_image_path")
-            continue
         if require_lq and not lq_image_path:
             raise ValueError(
                 f"Dataset '{dataset_name}' requires lq_image_path for diffusion training."
             )
-
-        gt_image_list = list_image_files(gt_image_path, extensions)
-        if len(gt_image_list) == 0:
-            print(f"No GT images found in {gt_image_path}")
-            continue
+        if require_lq and not gt_image_path:
+            raise ValueError(
+                f"Dataset '{dataset_name}' requires gt_image_path for diffusion training."
+            )
 
         lol_gt_dict = index_by_basename(list_image_files(lol_gt_path, extensions)) if lol_gt_path else {}
         lq_image_dict = {}
         if lq_image_path:
             search_path = resolve_dataset_subdir(lq_image_path, dataset_info)
             lq_image_dict = index_by_basename(list_image_files(search_path, extensions))
+
+        if not gt_image_path:
+            for basename, lq_path in lq_image_dict.items():
+                data_mappings.append({
+                    'gt_image_path': None,
+                    'lol_gt_path': lol_gt_dict.get(basename),
+                    'lq_image_path': lq_path,
+                    'basename': basename,
+                })
+            continue
+
+        gt_image_list = list_image_files(gt_image_path, extensions)
+        if len(gt_image_list) == 0:
+            print(f"No GT images found in {gt_image_path}")
+            continue
 
         for gt_path in gt_image_list:
             basename = basename_without_ext(gt_path)

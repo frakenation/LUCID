@@ -23,8 +23,11 @@ def main():
     """Run LUCID single-CFG inference."""
     parser = argparse.ArgumentParser(description='LUCID single-CFG inference')
 
-    parser.add_argument('--dataset_config_path', type=str, required=True,
-                       help='Path to dataset configuration YAML file')
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument('--input_dir', type=str,
+                             help='Directory containing input images')
+    input_group.add_argument('--dataset_config_path', type=str,
+                             help='Path to dataset configuration YAML file')
     parser.add_argument('--pretrained_model_name_or_path', type=str,
                        default='stabilityai/sd-turbo',
                        help='Base model path (SD-Turbo or local path)')
@@ -84,6 +87,7 @@ def main():
 
     dataset = LUCIDPairedDataset(
         dataset_config_path=args.dataset_config_path,
+        input_dir=args.input_dir,
         height=args.resolution,
         width=args.resolution
     )
@@ -118,10 +122,6 @@ def main():
             lq_images = batch['input_image'].to(args.device)
 
             positive_prompt = args.positive_prompt
-
-            gt_images = batch.get('gt_image')
-            if gt_images is not None:
-                gt_images = gt_images.to(args.device)
 
             if args.inference_mode == "cfg_guidance":
                 result = model(
@@ -174,7 +174,7 @@ def main():
     with open(info_path, 'w') as f:
         f.write(f"LUCID Inference Results\n")
         f.write(f"="*50 + "\n")
-        f.write(f"Dataset config: {args.dataset_config_path}\n")
+        f.write(f"Input source: {args.input_dir or args.dataset_config_path}\n")
         f.write(f"Total samples processed: {sample_idx}\n")
         f.write(f"Model checkpoint: {args.model_path}\n")
         f.write(f"Flare disentanglement checkpoint: {args.flare_disentanglement_path}\n")
