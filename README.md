@@ -259,7 +259,16 @@ datasets:
     gt_image_path: "./data/test/gt"
 ```
 
-For restoration or inference, each dataset item needs `gt_image_path` and either `lq_image_path` or `lol_gt_path`.
+Files are aligned by their filename stem, so `input/0001.jpg`, `low/0001.png`, and
+`gt/0001.png` form one sample. Main diffusion training requires `gt_image_path`
+and a precomputed `lq_image_path`; GT files without a matching LQ filename are
+excluded. `lol_gt_path` is optional for the main diffusion dataset and enables
+negative-mode targets.
+
+Flare-reinput training and flare-disentanglement training use `lol_gt_path`
+together with the configured flare assets to synthesize flare-corrupted inputs
+online. They do not consume precomputed files from `lq_image_path`. Inference
+continues to accept `lq_image_path` directly.
 
 For synthetic-flare training, download **Flare7K++** from the official [ykdai/Flare7K repository](https://github.com/ykdai/Flare7K#data-download). After extracting the dataset, configure its `Flare7K` and `Flare-R` folders in `dataloader/dataset_diff.yml`:
 

@@ -128,11 +128,13 @@ class FlareDisentanglementDataset(data.Dataset):
 class LUCIDPairedDataset(data.Dataset):
     """Aligned restoration pairs for the main LUCID restoration model."""
 
-    def __init__(self, dataset_config_path, height=512, width=512, flare_config_path=None):
+    def __init__(self, dataset_config_path, height=512, width=512, flare_config_path=None,
+                 require_lq=False):
         super().__init__()
 
         self.target_size = (height, width)
         self.ext = IMAGE_EXTENSIONS
+        self.require_lq = require_lq
         self.flare_config = None
         if flare_config_path is not None:
             self.flare_config = load_config(flare_config_path)
@@ -143,7 +145,16 @@ class LUCIDPairedDataset(data.Dataset):
             self.resize_target = min(height, width)
 
         dataset_config = load_config(dataset_config_path)
-        self.data_mappings = load_aligned_restoration_mappings(dataset_config, self.ext)
+        self.data_mappings = load_aligned_restoration_mappings(
+            dataset_config,
+            self.ext,
+            require_lq=self.require_lq,
+        )
+        if self.require_lq and not self.data_mappings:
+            raise ValueError(
+                "No aligned GT/LQ pairs found. Diffusion training requires lq_image_path "
+                "and matching GT/LQ basenames."
+            )
         self.lol_data_list = [
             mapping['lq_image_path'] or mapping['lol_gt_path']
             for mapping in self.data_mappings
@@ -165,7 +176,9 @@ class LUCIDPairedDataset(data.Dataset):
 
     def load_datasets(self, dataset_config):
         """Compatibility hook for callers that expect this method to populate mappings."""
-        self.data_mappings.extend(load_aligned_restoration_mappings(dataset_config, self.ext))
+        self.data_mappings.extend(
+            load_aligned_restoration_mappings(dataset_config, self.ext, require_lq=self.require_lq)
+        )
 
     def __len__(self):
         return len(self.data_mappings)
@@ -214,6 +227,9 @@ class LUCIDPairedDataset(data.Dataset):
             if input_tensor.shape[-2:] != self.target_size:
                 input_tensor = self.preprocess_image_consistent(input_image)
             return input_tensor
+
+        if self.require_lq:
+            return None
 
         lol_path = mapping.get('lol_gt_path')
         if lol_path and os.path.exists(lol_path):

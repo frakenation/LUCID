@@ -39,7 +39,9 @@ class InferenceAndFlareCleanupTest(unittest.TestCase):
         checked_paths = [
             PROJECT_ROOT / "src/inference.py",
             PROJECT_ROOT / "src/inference_cfg_index.py",
+            PROJECT_ROOT / "src/model_cfg.py",
             PROJECT_ROOT / "src/train_disentangle.py",
+            PROJECT_ROOT / "src/train_lucid.py",
         ]
 
         for path in checked_paths:
@@ -48,6 +50,8 @@ class InferenceAndFlareCleanupTest(unittest.TestCase):
             self.assertNotIn('print("="', source)
             self.assertNotIn("Initializing", source)
             self.assertNotIn("Model loaded", source)
+            self.assertNotIn("Number of trainable parameters", source)
+            self.assertNotIn("Number of parameters in flare", source)
 
 
 if __name__ == "__main__":

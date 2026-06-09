@@ -12,7 +12,6 @@ python -m src.train_lucid \
     --output_dir ./lucid_checkpoints \
     --lambda_lpips 1.0 \
     --lambda_l2 1.0 \
-    --lambda_ea_dists 0.0 \
     --neg_prob 0.1 \
     --flare_reinput_prob 0.0 \
     --lambda_intrinsic_multilevel 0.0 \

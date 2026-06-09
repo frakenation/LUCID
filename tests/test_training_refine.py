@@ -21,6 +21,21 @@ class TrainingRefineTest(unittest.TestCase):
         self.assertIn("input_range='01'", source)
         self.assertIn("input_range='neg11'", source)
 
+    def test_diffusion_training_requires_precomputed_lq(self):
+        train_source = (PROJECT_ROOT / "src/train_lucid.py").read_text(encoding="utf-8")
+        dataset_source = (PROJECT_ROOT / "dataloader/paired_datasets.py").read_text(encoding="utf-8")
+
+        self.assertEqual(train_source.count("require_lq=True"), 2)
+        self.assertIn("if self.require_lq:", dataset_source)
+        self.assertIn("flare = result['flare']", train_source)
+
+    def test_synthetic_training_datasets_generate_flare_online(self):
+        dataset_source = (PROJECT_ROOT / "dataloader/paired_datasets.py").read_text(encoding="utf-8")
+
+        self.assertIn("class FlareDisentanglementDataset", dataset_source)
+        self.assertIn("class LUCIDFlareReinputDataset", dataset_source)
+        self.assertGreaterEqual(dataset_source.count("synthesize_flare("), 4)
+
     def test_flare_forward_hides_illumination_estimator(self):
         source = (PROJECT_ROOT / "src/Flare_Disentangle.py").read_text(encoding="utf-8")
         forward_body = source.split("def forward(self, lq_image):", 1)[1].split("\nclass ", 1)[0]

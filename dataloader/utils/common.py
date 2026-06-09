@@ -105,7 +105,7 @@ def load_flare_assets(dataset_config, extensions=IMAGE_EXTENSIONS, include_light
     return assets
 
 
-def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSIONS):
+def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSIONS, require_lq=False):
     """Create LUCID restoration mappings aligned by GT basename."""
     data_mappings = []
 
@@ -113,9 +113,14 @@ def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSION
         lol_gt_path = dataset_info.get('lol_gt_path')
         gt_image_path = dataset_info.get('gt_image_path')
         lq_image_path = dataset_info.get('lq_image_path')
+        dataset_name = dataset_info.get('name', '<unnamed>')
         if not gt_image_path:
             print("Skipping dataset without gt_image_path")
             continue
+        if require_lq and not lq_image_path:
+            raise ValueError(
+                f"Dataset '{dataset_name}' requires lq_image_path for diffusion training."
+            )
 
         gt_image_list = list_image_files(gt_image_path, extensions)
         if len(gt_image_list) == 0:
@@ -130,10 +135,13 @@ def load_aligned_restoration_mappings(dataset_config, extensions=IMAGE_EXTENSION
 
         for gt_path in gt_image_list:
             basename = basename_without_ext(gt_path)
+            lq_path = lq_image_dict.get(basename)
+            if require_lq and lq_path is None:
+                continue
             data_mappings.append({
                 'gt_image_path': gt_path,
                 'lol_gt_path': lol_gt_dict.get(basename),
-                'lq_image_path': lq_image_dict.get(basename),
+                'lq_image_path': lq_path,
                 'basename': basename
             })
 
@@ -160,4 +168,3 @@ def load_image_any_format(img_path):
             raise
 
     return Image.open(img_path).convert('RGB')
-

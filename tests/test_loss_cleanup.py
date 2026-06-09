@@ -21,6 +21,9 @@ REMOVED_LOSS_TOKENS = (
     "lambda_wavelet",
     "lambda_gtmean",
     "gtmean_sigma",
+    "EA_DISTS",
+    "ea_dists",
+    "lambda_ea_dists",
 )
 
 

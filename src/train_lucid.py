@@ -26,7 +26,6 @@ import wandb
 
 from .model_cfg import LUCIDRestorationModel, load_ckpt_from_state_dict, save_ckpt
 from dataloader.paired_datasets import LUCIDFlareReinputDataset, LUCIDPairedDataset
-from .utils.loss import EA_DISTS_Loss
 
 def tensor_to_wandb_image(tensor, input_range='01'):
     if input_range == 'neg11':
@@ -86,11 +85,9 @@ def main(args):
             'blur_sigma': args.colorfix_blur_sigma,
             'min_area_ratio': args.colorfix_min_area_ratio
         }
-        print("="*60)
         print("Color Fix Configuration:")
         for k, v in colorfix_config.items():
             print(f"  {k}: {v}")
-        print("="*60)
 
     net_lucid = LUCIDRestorationModel(
         lora_rank_vae=args.lora_rank_vae,
@@ -124,11 +121,6 @@ def main(args):
     for param in net_vgg.parameters():
         param.requires_grad_(False)
 
-    net_ea_dists = None
-    if args.lambda_ea_dists > 0:
-        net_ea_dists = EA_DISTS_Loss(input_range='neg11')
-        print(f"EA-DISTS Loss initialized")
-
     layers_to_opt = []
     layers_to_opt += list(net_lucid.unet.parameters())
 
@@ -154,7 +146,8 @@ def main(args):
         args.dataset_config_path,
         height=args.resolution,
         width=args.resolution,
-        flare_config_path=args.flare_config_path
+        flare_config_path=args.flare_config_path,
+        require_lq=True,
     )
 
     dl_train = torch.utils.data.DataLoader(
@@ -192,7 +185,8 @@ def main(args):
         dataset_config_path=args.dataset_config_path,
         flare_config_path=args.flare_config_path,
         height=args.resolution,
-        width=args.resolution
+        width=args.resolution,
+        require_lq=True,
     )
     random.Random(42).shuffle(dataset_val.lol_data_list)
     dl_val = torch.utils.data.DataLoader(dataset_val, batch_size=1, shuffle=False, num_workers=0)
@@ -204,13 +198,13 @@ def main(args):
             ckpt_files = glob(os.path.join(args.resume, "*.pkl"))
             assert len(ckpt_files) > 0, f"No checkpoint files found: {args.resume}"
             ckpt_files = sorted(ckpt_files, key=lambda x: int(x.split("/")[-1].replace("model_", "").replace(".pkl", "")))
-            print("="*50); print(f"Loading checkpoint from {ckpt_files[-1]}"); print("="*50)
+            print(f"Loading checkpoint from {ckpt_files[-1]}")
             global_step = int(ckpt_files[-1].split("/")[-1].replace("model_", "").replace(".pkl", ""))
             net_lucid, optimizer = load_ckpt_from_state_dict(
                 net_lucid, optimizer, ckpt_files[-1]
             )
         elif args.resume.endswith(".pkl"):
-            print("="*50); print(f"Loading checkpoint from {args.resume}"); print("="*50)
+            print(f"Loading checkpoint from {args.resume}")
             global_step = int(args.resume.split("/")[-1].replace("model_", "").replace(".pkl", ""))
             net_lucid, optimizer = load_ckpt_from_state_dict(
                 net_lucid, optimizer, args.resume
@@ -218,7 +212,7 @@ def main(args):
         else:
             raise NotImplementedError(f"Invalid resume path: {args.resume}")
     else:
-        print("="*50); print(f"Training from scratch"); print("="*50)
+        print("Training from scratch")
 
     weight_dtype = torch.float32
     if accelerator.mixed_precision == "fp16":
@@ -230,19 +224,9 @@ def main(args):
     net_lpips.to(accelerator.device, dtype=weight_dtype)
     net_vgg.to(accelerator.device, dtype=weight_dtype)
 
-    prepare_list = [net_lucid, optimizer, dl_train, lr_scheduler]
-
-    if net_ea_dists is not None:
-        prepare_list.append(net_ea_dists)
-
-    prepared_objects = accelerator.prepare(*prepare_list)
-
-    net_lucid, optimizer, dl_train, lr_scheduler = prepared_objects[:4]
-
-    current_idx = 4
-    if net_ea_dists is not None:
-        net_ea_dists = prepared_objects[current_idx]
-        current_idx += 1
+    net_lucid, optimizer, dl_train, lr_scheduler = accelerator.prepare(
+        net_lucid, optimizer, dl_train, lr_scheduler
+    )
 
     net_lpips, net_vgg = accelerator.prepare(net_lpips, net_vgg)
     t_vgg_renorm = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
@@ -324,6 +308,7 @@ def main(args):
 
                 enhanced_image = result['enhanced_image']
                 target_image = result['target_image']
+                flare = result['flare']
 
                 if args.gamma_augmentation:
                     target_image = apply_gamma_augmentation(
@@ -347,12 +332,6 @@ def main(args):
                 else:
                     loss_intrinsic_multilevel = torch.tensor(0.0).to(weight_dtype)
 
-                if args.lambda_ea_dists > 0 and net_ea_dists is not None:
-                    loss_ea_dists = net_ea_dists(enhanced_image, target_image_neg11) * args.lambda_ea_dists
-                    loss += loss_ea_dists
-                else:
-                    loss_ea_dists = torch.tensor(0.0).to(weight_dtype)
-
                 accelerator.backward(loss, retain_graph=False)
                 if accelerator.sync_gradients:
                     accelerator.clip_grad_norm_(layers_to_opt, args.max_grad_norm)
@@ -369,7 +348,6 @@ def main(args):
                     logs["loss_l2"] = loss_l2.detach().item()
                     logs["loss_lpips"] = loss_lpips.detach().item()
                     logs["loss_intrinsic_multilevel"] = loss_intrinsic_multilevel.detach().item()
-                    logs["loss_ea_dists"] = loss_ea_dists.detach().item()
                     logs["loss"] = loss.detach().item()
 
                     if use_flare_reinput:
@@ -469,8 +447,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lambda_lpips", default=1.0, type=float)
     parser.add_argument("--lambda_l2", default=1.0, type=float)
-    parser.add_argument("--lambda_ea_dists", default=0.0, type=float, help="Weight for EA-DISTS loss")
-
     parser.add_argument("--enable_colorfix", action="store_true",
                        help="Enable wavelet color fix in preprocessing pipeline")
     parser.add_argument("--colorfix_mask_threshold", type=float, default=0.125,

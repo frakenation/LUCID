@@ -157,7 +157,6 @@ class LUCIDRestorationModel(torch.nn.Module):
             load_lucid_components(vae, unet, sd)
 
         elif pretrained_name is None and pretrained_path is None:
-            print("Initializing model with random weights")
             target_modules_vae = []
 
             torch.nn.init.constant_(vae.decoder.skip_conv_1.weight, 1e-5)
@@ -192,13 +191,6 @@ class LUCIDRestorationModel(torch.nn.Module):
         self.vae.decoder.gamma = 0.2
         self.timesteps = torch.tensor([timestep], device="cuda").long()
         self.text_encoder.requires_grad_(False)
-
-        print("="*50)
-        print(f"Number of trainable parameters in UNet: {sum(p.numel() for p in unet.parameters() if p.requires_grad) / 1e6:.2f}M")
-        print(f"Number of trainable parameters in VAE: {sum(p.numel() for p in vae.parameters() if p.requires_grad) / 1e6:.2f}M")
-        if self.flare_disentanglement_net is not None:
-            print(f"Number of parameters in flare disentanglement network (frozen): {sum(p.numel() for p in self.flare_disentanglement_net.parameters()) / 1e6:.2f}M")
-        print("="*50)
 
         self.enable_colorfix = enable_colorfix
         self.colorfix_config = colorfix_config or {
