@@ -19,9 +19,6 @@ python -m src.inference_cfg_index \
     --ms_unet \
     --enable_hdr_fusion \
     --visualize_weights \
-    --hdr_pyramid_levels 5 \
-    --hdr_saturation_threshold 0.98 \
-    --hdr_darkness_threshold 0.02 \
     --tonemap_method drago \
     --device cuda \
     --seed 42

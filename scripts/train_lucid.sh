@@ -12,9 +12,9 @@ python -m src.train_lucid \
     --output_dir ./lucid_checkpoints \
     --lambda_lpips 1.0 \
     --lambda_l2 1.0 \
-    --neg_prob 0.1 \
-    --flare_reinput_prob 0.0 \
-    --lambda_intrinsic_multilevel 0.0 \
+    --neg_prob 0.2 \
+    --flare_reinput_prob 0.5 \
+    --lambda_intrinsic_multilevel 1.0 \
     --eval_freq 500 \
     --num_samples_eval 100 \
     --viz_freq 100 \
