@@ -292,6 +292,18 @@ The example scripts are intentionally written as explicit command lines. Replace
 
 ## Inference
 
+Choose exactly one input source for inference. Pass an image directory directly:
+
+```bash
+--input_dir ./data/test/input
+```
+
+Or use a dataset configuration file containing `lq_image_path`:
+
+```bash
+--dataset_config_path dataloader/dataset_test.yml
+```
+
 Single-scale restoration:
 
 ```bash
