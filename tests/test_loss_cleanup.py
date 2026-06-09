@@ -24,6 +24,13 @@ REMOVED_LOSS_TOKENS = (
     "EA_DISTS",
     "ea_dists",
     "lambda_ea_dists",
+    "flare_sparsity",
+    "background_context_range",
+    "background_range",
+    "flare_range",
+    "detail_preservation",
+    "edge_preservation_loss",
+    "sparsity_loss",
 )
 
 

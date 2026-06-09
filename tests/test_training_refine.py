@@ -54,6 +54,18 @@ class TrainingRefineTest(unittest.TestCase):
         self.assertNotIn("max_rgb", train_source)
         self.assertNotIn("reflectance", train_source)
 
+    def test_disentanglement_tensorboard_dir_handles_none(self):
+        source = (PROJECT_ROOT / "src/train_disentangle.py").read_text(encoding="utf-8")
+
+        self.assertIn("config.get('tensorboard_dir') or os.path.join(", source)
+
+    def test_orthogonal_loss_stays_inside_disentanglement_training(self):
+        model_source = (PROJECT_ROOT / "src/model_cfg.py").read_text(encoding="utf-8")
+        loss_source = (PROJECT_ROOT / "src/utils/loss.py").read_text(encoding="utf-8")
+
+        self.assertNotIn("'orth_loss':", model_source)
+        self.assertIn("losses['orthogonal']", loss_source)
+
 
 if __name__ == "__main__":
     unittest.main()

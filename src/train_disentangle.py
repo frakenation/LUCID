@@ -60,7 +60,10 @@ class FlareDisentanglementTrainer:
         self.checkpoint_dir = config.get('checkpoint_dir', './checkpoints')
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
-        self.tensorboard_dir = config.get('tensorboard_dir', os.path.join(self.checkpoint_dir, 'tensorboard'))
+        self.tensorboard_dir = config.get('tensorboard_dir') or os.path.join(
+            self.checkpoint_dir,
+            'tensorboard',
+        )
         os.makedirs(self.tensorboard_dir, exist_ok=True)
         self.writer = SummaryWriter(log_dir=self.tensorboard_dir)
 
@@ -141,10 +144,10 @@ class FlareDisentanglementTrainer:
 
                 self.optimizer.zero_grad()
 
-                background_context, background, flare, orth_loss = self.model(lq_image)
+                _, background, flare, orth_loss = self.model(lq_image)
 
                 total_loss, loss_dict = self.criterion(
-                    background_context, background, flare, lq_image, orth_loss,
+                    background, flare, lq_image, orth_loss,
                     flare_gt=flare_gt, lol_gt=lol_gt
                 )
 
@@ -200,10 +203,10 @@ class FlareDisentanglementTrainer:
                 if lol_gt is not None:
                     lol_gt = lol_gt.to(self.device)
 
-                background_context, background, flare, orth_loss = self.model(lq_image)
+                _, background, flare, orth_loss = self.model(lq_image)
 
                 total_loss, loss_dict = self.criterion(
-                    background_context, background, flare, lq_image, orth_loss,
+                    background, flare, lq_image, orth_loss,
                     flare_gt=flare_gt, lol_gt=lol_gt
                 )
 

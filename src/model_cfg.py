@@ -433,12 +433,11 @@ class LUCIDRestorationModel(torch.nn.Module):
 
         if self.flare_disentanglement_net is not None:
             with torch.no_grad():
-                background_context, background, flare, orth_loss = self.flare_disentanglement_net(lq_image)
+                background_context, background, flare, _ = self.flare_disentanglement_net(lq_image)
         else:
             background_context = torch.mean(lq_image, dim=1, keepdim=True)
             background = lq_image
             flare = torch.zeros_like(lq_image)
-            orth_loss = torch.tensor(0.0).to(lq_image.device)
 
         processed_lq_image = self.background_with_noise_injection(
             lq_image, background_context, background, flare
@@ -506,7 +505,6 @@ class LUCIDRestorationModel(torch.nn.Module):
             'background_context': background_context,
             'background': background,
             'flare': flare,
-            'orth_loss': orth_loss,
             'processed_lq_image': processed_lq_image,
             'target_image': target_image
         }
