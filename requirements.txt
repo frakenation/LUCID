@@ -1,12 +1,30 @@
+# Core
 torch
 torchvision
-torchmetrics
-wandb
-imageio[ffmpeg]
+numpy
+Pillow
+PyYAML
+tqdm
+requests
+
+# Diffusion model
 einops
-lpips
-xformers
 peft==0.9.0
 diffusers==0.25.1
 huggingface-hub==0.25.1
 transformers==4.38.0
+xformers
+
+# Training
+accelerate
+lpips
+tensorboard
+wandb
+
+# Image processing and flare synthesis
+matplotlib
+opencv-python-headless
+OpenEXR
+rawpy
+scikit-image
+scipy
