@@ -239,14 +239,15 @@ Install the PyTorch build matching your CUDA environment if it is not already av
 | Component | Description | Download Link |
 | --- | --- | --- |
 | SD-Turbo | Pretrained one-step diffusion backbone | [Hugging Face](https://huggingface.co/stabilityai/sd-turbo) |
-| LUCID Checkpoints | Main restoration and flare disentanglement checkpoints | [Hugging Face](https://huggingface.co/Unswear/LUCID) |
+| Flare Disentanglement | Required for public LUCID inference | [Hugging Face](https://huggingface.co/Unswear/LUCID) / [Google Drive](https://drive.google.com/file/d/1r3pisp_sxNqbLc3svHk6pue0Sl0BVSp-/view?usp=sharing) |
+| LUCID Restoration | Main restoration checkpoint | [Hugging Face](https://huggingface.co/Unswear/LUCID) / [Google Drive](https://drive.google.com/file/d/1TSY1KjYA-m4MaCZYMAFqf1ACYmKktJNL/view?usp=sharing) |
 
-Download SD-Turbo and the LUCID checkpoints with Git LFS:
+Download SD-Turbo and the LUCID checkpoints:
 
 ```bash
 git lfs install
 git clone https://huggingface.co/stabilityai/sd-turbo /path/to/sd-turbo
-git clone https://huggingface.co/Unswear/LUCID /path/to/lucid_weights
+hf download Unswear/LUCID --local-dir /path/to/lucid_weights
 ```
 
 Use the downloaded checkpoint paths in the scripts:
