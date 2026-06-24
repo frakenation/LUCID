@@ -28,7 +28,7 @@
   <a href="https://arxiv.org/abs/2606.06901">
     <img src="https://img.shields.io/badge/Paper-arXiv-red?logo=arxiv">
   </a>
-  <a href="https://huggingface.co/Unswear/LUCID">
+  <a href="https://huggingface.co/OpticAI/LUCID">
     <img src="https://img.shields.io/badge/Model-Hugging%20Face-yellow">
   </a>
   <a href="https://www.youtube.com/watch?v=AGPLSiZcK_I">
@@ -239,15 +239,15 @@ Install the PyTorch build matching your CUDA environment if it is not already av
 | Component | Description | Download Link |
 | --- | --- | --- |
 | SD-Turbo | Pretrained one-step diffusion backbone | [Hugging Face](https://huggingface.co/stabilityai/sd-turbo) |
-| Flare Disentanglement | Required for public LUCID inference | [Hugging Face](https://huggingface.co/Unswear/LUCID) / [Google Drive](https://drive.google.com/file/d/1r3pisp_sxNqbLc3svHk6pue0Sl0BVSp-/view?usp=sharing) |
-| LUCID Restoration | Main restoration checkpoint | [Hugging Face](https://huggingface.co/Unswear/LUCID) / [Google Drive](https://drive.google.com/file/d/1TSY1KjYA-m4MaCZYMAFqf1ACYmKktJNL/view?usp=sharing) |
+| Flare Disentanglement | Required for public LUCID inference | [Hugging Face](https://huggingface.co/OpticAI/LUCID) / [Google Drive](https://drive.google.com/file/d/1r3pisp_sxNqbLc3svHk6pue0Sl0BVSp-/view?usp=sharing) |
+| LUCID Restoration | Main restoration checkpoint | [Hugging Face](https://huggingface.co/OpticAI/LUCID) / [Google Drive](https://drive.google.com/file/d/1TSY1KjYA-m4MaCZYMAFqf1ACYmKktJNL/view?usp=sharing) |
 
 Download SD-Turbo and the LUCID checkpoints:
 
 ```bash
 git lfs install
 git clone https://huggingface.co/stabilityai/sd-turbo /path/to/sd-turbo
-hf download Unswear/LUCID --local-dir /path/to/lucid_weights
+hf download OpticAI/LUCID --local-dir /path/to/lucid_weights
 ```
 
 Use the downloaded checkpoint paths in the scripts:
